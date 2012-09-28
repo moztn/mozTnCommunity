@@ -1,6 +1,8 @@
 <?php
 session_start();
 include("scripts/identifiants.php");
+$nbr_non_vus = mysql_query("SELECT COUNT(*) AS nbre FROM mp WHERE destinataire='".$_SESSION['pseudo']."' AND vu='0' AND (efface='0' OR efface='2')")or die(mysql_error());
+$nbre_non_vus = mysql_fetch_assoc($nbr_non_vus);
 ?>
 <!DOCTYPE html>
 <title>Mozilla Tunisia | Membre</title>
@@ -18,10 +20,43 @@ include("scripts/identifiants.php");
 	<link rel="stylesheet" href="styles/demos.css">
 	<script>
 	$(function() {
-		$( "#datepicker" ).datepicker();
+		$( "#datepicker" ).datepicker({ minDate: "-90Y", maxDate: "-10Y" });
 	});
 	</script>
-
+	<link rel="stylesheet" href="interet/colorbox/colorbox.css" />
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+		<script src="interet/colorbox/jquery.colorbox.js"></script>
+	<script>
+			$(document).ready(function(){
+				//Examples of how to assign the ColorBox event to elements
+				$(".group1").colorbox({rel:'group1'});
+				$(".group2").colorbox({rel:'group2', transition:"fade"});
+				$(".group3").colorbox({rel:'group3', transition:"none", width:"75%", height:"75%"});
+				$(".group4").colorbox({rel:'group4', slideshow:true});
+				$(".ajax").colorbox();
+				$(".youtube").colorbox({iframe:true, innerWidth:425, innerHeight:344});
+				$(".iframe").colorbox({iframe:true, width:"70%", height:"100%"});
+				$(".inline").colorbox({inline:true, width:"50%"});
+				$(".callbacks").colorbox({
+					onOpen:function(){ alert('onOpen: colorbox is about to open'); },
+					onLoad:function(){ alert('onLoad: colorbox has started to load the targeted content'); },
+					onComplete:function(){ alert('onComplete: colorbox has displayed the loaded content'); },
+					onCleanup:function(){ alert('onCleanup: colorbox has begun the close process'); },
+					onClosed:function(){ alert('onClosed: colorbox has completely closed'); }
+				});
+				
+				//Example of preserving a JavaScript event for inline calls.
+				$("#click").click(function(){ 
+					$('#click').css({"background-color":"#f00", "color":"#fff", "cursor":"inherit"}).text("Open this window again and this message will still be here.");
+					return false;
+				});
+			});
+		</script>
+		
+		
+	<script type="text/javascript" src="scripts/jquery.popin.js"></script>
+	
+	
 <link href="tab/css/tabzilla.css" rel="stylesheet" />
 <script src="tab/js/tabzilla.js"></script>
 </head>
@@ -50,11 +85,17 @@ if (isset($_SESSION['pseudo'])) // Si le membre est connecté
 else
 {
 ?>	
-	<a href="connexion.php">Sign In</a> or <a href="register.php">Join</a>
+	<a href="connexion.php">Sign In</a>
 	<?php } ?> 
+
+
 </div>
+
+
+
 <div class="main-container">
   <div id="sub-headline">
+    <!--<div class="tagline_left"><p id="tagline2">Tel: 123 333 4444 | Mail: <a href="mailto:email@website.com">email@website.com</a></p></div>-->
     <div class="tagline_right">
       <form action="#" method="post">
         <fieldset>
@@ -70,10 +111,25 @@ else
 <div class="main-container">
   <div id="nav-container">
    <nav> 
-    <ul class="nav">
-      <li><a href="index.php">Home</a></li>
-      <li class="active"><a href="membre.php">Membre</a></li>     
-      <li class="last"><a href="contact.php">Contact</a></li>
+    <ul>
+      <li class="active"><a href="index.php">Home</a></li>
+      <li><a href="membre.php">Membre</a></li>      
+      <!--<li><a href="portfolio.html">Portfolio</a></li>
+      <li><a href="gallery.html">Gallery</a></li>-->
+	  <li><a href="./events/">Events</a></li>
+	  <li><a href="./calendar/all">Calendrier</a></li>
+      <li class="last"><a href="contact.php">Contact</a></li>    
+	  <?php if (isset($_SESSION['pseudo'])) // Si le membre est connecté
+{ ?>
+	  <li><a href="./mp.php">Messages(<?php echo $nbre_non_vus['nbre'];?>)</a>
+        <ul>
+          <li><a href="./mp.php">Boite de réception</a>          
+          <li><a href="./mp.php?action=ecrire">Nouveau Message</a></li>          
+          <li><a href="./mp.php?action=LireMpRecu">Message Envoyer</a></li>
+		  <li><a href="./mp.php?action=Corbeil">Message Supprimer</a></li>
+        </ul>
+      </li>
+	  <?php }?>
     </ul>
    </nav> 
     <div class="clear"></div>
@@ -114,9 +170,9 @@ else
 		<div class="profildroit" style="padding-top: 10px; padding-bottom: 5px; margin-top: 5px;">
 		<h6 align="center" style="font-size:14px;"><strong>Information Du Compte</strong></h6>
 		<?php			
-			echo'<p class="profile-item"><strong class="white radius label">Nom d\'utilisateur :</strong> <input style="width:62%" tabindex="1" name="pseudo" id="pseudo" value="'.stripslashes(htmlspecialchars($data1['pseudo'])).'" type="text" onblur="verifpseudo(this)" class="input-text big"/> </p>';			
-			echo'<p class="profile-item"><strong class="white radius label">Nouveau mot de Passe :</strong><input style="width:55%" name="password" type="password" id="password" value="'.stripslashes($data1['mdp']).'" class="input-text big"/></p>';
-            echo'<p class="profile-item"><strong class="white radius label">Confirmer le mot de passe :</strong><input style="width:50%" name="confirm" type="password" id="confirm" value="'.stripslashes($data1['mdp']).'" class="input-text big"/></p>';
+			echo'<p class="profile-item"><strong class="white radius label">Nom d\'utilisateur :</strong> '.stripslashes(htmlspecialchars($data1['pseudo'])).'</p>';			
+			echo'<p class="profile-item"><strong class="white radius label">Nouveau mot de Passe :</strong><input style="width:55%" name="password" type="password" id="password" value="" class="input-text big"/></p>';
+            echo'<p class="profile-item"><strong class="white radius label">Confirmer le mot de passe :</strong><input style="width:50%" name="confirm" type="password" id="confirm" value="" class="input-text big"/></p>';
 			echo'<p class="profile-item"><strong class="white radius label">Date d\'inscription : </strong>'.date('d/m/Y',$data1['dateinscri']).'</p>';
 			echo'<p class="profile-item"><strong class="white radius label">Derniere Visite : </strong>'.date('d/m/Y',$data1['dervisit']).'</p>';
 		?>	
@@ -162,8 +218,15 @@ else
 		   <div class="profildroit">
 			<h6 align="center" style="font-size:14px;"><strong>Information Personelle</strong></h6>
 	   <?php
+	   
+		
 		echo'<p class="profile-item"><strong class="white radius label">Prenom :</strong><input tabindex="3" style="width:78%" name="prenom" id="username3" size="25" value="'.stripslashes(htmlspecialchars($data1['prenom'])).'" title="Prénom" type="text" onblur="verifnom(this)" class="input-text big" /></p>';
 		echo'<p class="profile-item"><strong class="white radius label">Nom :</strong><input tabindex="2" style="width:83%" name="nom" id="username2" size="25" value="'.stripslashes(htmlspecialchars($data1['nom'])).'" title="Nom" type="text" onblur="verifnom(this)" class="input-text big" />  </p>';
+		?>
+		
+
+
+		<?php
 		echo'<p class="profile-item"><strong class="white radius label">Date de naissance :</strong> <input value="'.stripslashes(htmlspecialchars($data1['datenais'])).'" name="annee" type="text" id="datepicker" size="5" style="width:60%" class="input-text big"/></p>';
 		echo'<p class="profile-item"><strong class="white radius label">Sexe :</strong>  ';
 		
@@ -194,9 +257,17 @@ else
 		echo'<p class="profile-item"><strong class="white radius label">Site Personel :</strong> <input style="width:70%" name="site" id="site" value="'.stripslashes(htmlspecialchars($data1['site'])).'" title="Adresse e-mail" type="text" onblur="verifvide(this)" class="input-text big"/> </p>';
        
 	   }
+	   
 	?>
+	</div>
+      <div class="profildroit" >
+	<h6 align="center" style="font-size:14px;"><strong>Intérets</strong></h6>		
+		<p><a class='iframe' href="interet/add.php">Modifier vos Intérêt</a></p>
+	</div>
 	</td>
+	
        </tr>
+	   
 	   </table>
 	   
 	<?php
@@ -215,23 +286,29 @@ else
 			echo'Cliquer <a href="connexion.php"><strong>ICI</strong></a> pour vous connectez et modifier votre propre profil';
 		}
 	?>
-    </div>
+    
+	</div>
+	
 	</form>
  </div>
 <div class="main-container">
  </div>
- 
+ <div style="position:fixed;left:30px;top:90%;" title="Clickez pour signaler un problème">
+<a href="404/bug.php"><img src="images/bug.png" alt="Logo" /></a>
+</div>
  <footer>
   <table>
 	<tr>
 	<td><img src="images/logo.png" alt="Logo" /></td>
     <td><p class="tagline_left">Copyright &copy; 2012 - All Rights Reserved - <a href="http://mozilla-tunisia.org">Mozilla Tunisia</a></p></td>
 	</tr>
-	</table>   
+	</table>
+    <!--<p class="tagline_right">Design by <a href="http://www.priteshgupta.com/" title="Pritesh Gupta" target="_blank" >PriteshGupta.com</a></p>-->
     <br class="clear" />
   </footer>
 
 <br />
 <br />
+<!-- Free template distributed by http://freehtml5templates.com -->
     </body>
 </html>

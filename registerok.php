@@ -1,6 +1,8 @@
 <?php
 session_start();
 include("scripts/identifiants.php");
+$nbr_non_vus = mysql_query("SELECT COUNT(*) AS nbre FROM mp WHERE destinataire='".$_SESSION['pseudo']."' AND vu='0' AND (efface='0' OR efface='2')")or die(mysql_error());
+$nbre_non_vus = mysql_fetch_assoc($nbr_non_vus);
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -36,11 +38,14 @@ if (isset($_SESSION['pseudo'])) // Si le membre est connecté
 }
 else
 {?>	
-	<a href="connexion.php">Sign In</a> or <a href="register.php">Join</a>
+	<a href="connexion.php">Sign In</a>
 	<?php } ?> 
 </div>
+
+
 <div class="main-container">
-  <div id="sub-headline">    
+  <div id="sub-headline">
+    <!--<div class="tagline_left"><p id="tagline2">Tel: 123 333 4444 | Mail: <a href="mailto:email@website.com">email@website.com</a></p></div>-->
     <div class="tagline_right">
       <form action="#" method="post">
         <fieldset>
@@ -58,8 +63,23 @@ else
    <nav> 
     <ul class="nav">
       <li><a href="index.php">Home</a></li>
-      <li class="active"><a href="membre.php">Membre</a></li>      
-      <li class="last"><a href="contact.php">Contact</a></li>
+      <li><a href="membre.php">Membre</a></li>      
+      <!--<li><a href="portfolio.html">Portfolio</a></li>
+      <li><a href="gallery.html">Gallery</a></li>-->
+	  <li><a href="./events/">Events</a></li>
+	  <li><a href="./calendar/all">Calendrier</a></li>
+      <li class="last"><a href="contact.php">Contact</a></li>    
+	  <?php if (isset($_SESSION['pseudo'])) // Si le membre est connecté
+{ ?>
+	  <li><a href="./mp.php">Messages(<?php echo $nbre_non_vus['nbre'];?>)</a>
+        <ul>
+          <li><a href="./mp.php">Boite de réception</a>          
+          <li><a href="./mp.php?action=ecrire">Nouveau Message</a></li>          
+          <li><a href="./mp.php?action=LireMpRecu">Message Envoyer</a></li>
+		  <li><a href="./mp.php?action=Corbeil">Message Supprimer</a></li>
+        </ul>
+      </li>
+	  <?php }?>
     </ul>
    </nav> 
     <div class="clear"></div>
@@ -78,12 +98,16 @@ else
 </div>
 <br />
 <br />
+
+    
     <div id="gallery" class="box">
 		
 <?php
+
 	if (!isset($_SESSION['pseudo'])) // Si le membre est connecté
 { 	
-		
+		//Maintenant, on se connecte à la base de données
+
 $pseudo_erreur1 = NULL;
 $pseudo_erreur2 = NULL;
 $mdp_erreur = NULL;
@@ -101,8 +125,6 @@ $prenom_erreur = NULL;
 $mdp_erreur = NULL;
 $mdp_erreur1 = NULL;
 $mdp_erreur2 = NULL;
-$quest_erreur = NULL;
-$rep_erreur = NULL;
 $propos_erreur = NULL;
 
 //On récupère les variables
@@ -114,19 +136,24 @@ $email = mysql_real_escape_string($_POST['email']);
 $confirmemail = mysql_real_escape_string($_POST['confirmemail']);
 $prenom = mysql_real_escape_string($_POST['prenom']);
 $sexe = mysql_real_escape_string($_POST['sexe']);
-$question = mysql_real_escape_string($_POST['question']);
-$reponse = mysql_real_escape_string($_POST['reponse']);
 $jour = mysql_real_escape_string($_POST['jour']);
 $mois = mysql_real_escape_string($_POST['mois']);
 $annee = mysql_real_escape_string($_POST['annee']);
 $propos = mysql_real_escape_string($_POST['propos']);
 //$valid = mysql_real_escape_string($_POST['code']);
 //$conmdp = md5($_POST['conmdp']);
-//$mdp = md5($_POST['mdp']);
-$mdp = $_POST['password'];
-$conmdp = $_POST['confirmpassword'];
+$mdp = md5($_POST['password']);
+//$mdp = $_POST['password'];
+$conmdp = md5($_POST['confirmpassword']);
 
 //Vérification du pseudo
+
+$nombrepseudo = mysql_result(mysql_query('SELECT COUNT(*) FROM users WHERE pseudo = "'.$pseudo.'"'), 0);
+if($nombrepseudo != 0)
+{
+        $pseudo_erreur1 = "Votre pseudo est déjà utilisé par un membre";
+        $i++;
+}
 
 if (strlen($pseudo) < 3 || strlen($pseudo) > 20)
 {
@@ -164,17 +191,6 @@ if (strlen($propos) < 3)
         $i++;
 }
 
-if (strlen($question) < 3)
-{
-        $quest_erreur= "Remplir le champ question secrette";
-        $i++;
-}
-
-if (strlen($reponse) < 3)
-{
-        $rep_erreur= "Remplir le champ reponse du question secrette";
-        $i++;
-}
 $nombremail = mysql_result(mysql_query('SELECT COUNT(*) FROM users WHERE email = "'.$email.'"'), 0);
 
 if ($nombremail != 0)
@@ -233,8 +249,9 @@ if ($i == 0) // Si i est vide, il n'y a pas d'erreur
          <h2>Inscription Reussite</h2>
   		<hr size="3" />
         <?php
-        echo'<p>Bienvenue '.stripslashes(htmlspecialchars($_POST['prenom'])).' '.stripslashes(htmlspecialchars($_POST['nom'])).' vous êtes maintenant inscrit dans la communauté de Mozilla Tunisia</p>';
-        echo'<p>Cliquez <a href="./index.php">ici</a> pour revenir à la page d\'accueil</p>';
+        echo'<p>Bienvenue '.stripslashes(htmlspecialchars($_POST['prenom'])).' '.stripslashes(htmlspecialchars($_POST['nom'])).' vous êtes maintenant inscrit et vous faites parti de la communauté de Mozilla Tunisia</p>';
+        echo'<p>Un Mail a été envoyé sur votre adresse mail '.$email.'. Consulté votre boite de réception pour validé votre inscription</p>';
+		echo'<p>Cliquez <a href="./index.php">ici</a> pour revenir à la page d\'accueil</p>';
               
     if (isset($_FILES['avatar']['size']))
         {
@@ -253,20 +270,47 @@ if ($i == 0) // Si i est vide, il n'y a pas d'erreur
                 $avatar = "./images/avatars/".str_replace(' ','',$avatar).".jpg";
                
         }
-		
+		$cle = md5(rand(1, 99999999));
         mysql_query('
-        INSERT INTO users (pseudo, mdp, email, avatar, nom, prenom, sexe, datenais, dateinscri, question, reponse, dervisit,propos) VALUES ("'.$pseudo.'" , "'.$mdp.'" , "'.$email.'" , "'.$nomavatar.'" , "'.$nom.'" , "'.$prenom.'" ,  "'.$sexe.'" , "'.$annee.'" , "'.$temps.'" , "'.$question.'" , "'.$reponse. '" , "'.$temps.'", "'.$propos. '" ) ') or die(mysql_error());
+        INSERT INTO users (pseudo, mdp, email, avatar, nom, prenom, sexe, datenais, dateinscri, dervisit,propos,cle_activation) VALUES ("'.$pseudo.'" , "'.$mdp.'" , "'.$email.'" , "'.$nomavatar.'" , "'.$nom.'" , "'.$prenom.'" ,  "'.$sexe.'" , "'.$annee.'" , "'.$temps.'" , "'.$temps.'", "'.$propos. '", "'.$cle.'" ) ') or die(mysql_error());
  	
+		
+		
+		$password = $_POST['password'];
+		$message = 'Bienvenue sur Mozilla Tunisia ,
+		
+		Vous êtes priés de conserver cet e-mail dans vos archives.
+		
+		Les informations concernant votre compte sur http://reps.mozilla-tunisia.org sont les suivantes :
+		
+		---------------------------------------------
+		Nom d\'utilisateur : '.$pseudo.'
+		Mot de passe : '.$password.'
+		---------------------------------------------
+		
+		Pour valider votre compte http://reps.mozilla-tunisia.org/valider.php?pseudo='.$pseudo.'&cle='.$cle.'
+		
+		Pour toute question veuillez nous contacter à contact@mozilla-tunisia.org
+		
+		Veuillez garder précieusement votre mot de passe car il est crypté chez nous.
+		
+		
+	    Si par erreur vous ne vous êtes jamais inscrit sur Mozilla Tunisia , ou que vous avez reçu ce message par erreur ,envoyez un mail à contact@mozilla-tunisia.org en disant de supprimer le compte.
+		Merci
+		---------------------------------------------
+		Mozilla Tunisia 
+		---------------------------------------------';
+		$objet = "Inscription sur Mozilla Tunisia";
 
-        $_SESSION['pseudo'] = $pseudo;
-        $_SESSION['id'] = mysql_insert_id();
-        $_SESSION['level'] = 2;
-	
+		$from = "From: MozillaTunisia <hajjejfiras@gmail.com>\n";
+		mail($email,$objet,$message,$from);
+		
+       
       
 }
 else
 {
-	if($valid == false) { $i++;}
+	
 	?>
     	 <h2>Inscription interrompue</h2>
   <hr size="3" />
@@ -305,7 +349,9 @@ mysql_close();
 
 <div class="main-container">
  </div>
-  
+  <div style="position:fixed;left:30px;top:90%;" title="Clickez pour signaler un problème">
+<a href="404/bug.php"><img src="images/bug.png" alt="Logo" /></a>
+</div>
  <footer>
    <table>
 	<tr>
@@ -313,10 +359,12 @@ mysql_close();
     <td><p class="tagline_left">Copyright &copy; 2012 - All Rights Reserved - <a href="http://mozilla-tunisia.org">Mozilla Tunisia</a></p></td>
 	</tr>
 	</table>
+    <!--<p class="tagline_right">Design by <a href="http://www.priteshgupta.com/" title="Pritesh Gupta" target="_blank" >PriteshGupta.com</a></p>-->
     <br class="clear" />
   </footer>
 
 <br />
 <br />
+<!-- Free template distributed by http://freehtml5templates.com -->
     </body>
 </html>

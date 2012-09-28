@@ -1,6 +1,8 @@
 <?php
 session_start();
 include("scripts/identifiants.php");
+$nbr_non_vus = mysql_query("SELECT COUNT(*) AS nbre FROM mp WHERE destinataire='".$_SESSION['pseudo']."' AND vu='0' AND (efface='0' OR efface='2')")or die(mysql_error());
+$nbre_non_vus = mysql_fetch_assoc($nbr_non_vus);
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -36,13 +38,14 @@ if (isset($_SESSION['pseudo'])) // Si le membre est connecté
 }
 else
 {?>	
-	<a href="connexion.php">Sign In</a> or <a href="register.php">Join</a>
+	<a href="connexion.php">Sign In</a>
 	<?php } ?> 
 </div>
 
 
 <div class="main-container">
   <div id="sub-headline">
+    <!--<div class="tagline_left"><p id="tagline2">Tel: 123 333 4444 | Mail: <a href="mailto:email@website.com">email@website.com</a></p></div>-->
     <div class="tagline_right">
       <form action="#" method="post">
         <fieldset>
@@ -58,10 +61,25 @@ else
 <div class="main-container">
   <div id="nav-container">
    <nav> 
-    <ul class="nav">
-      <li><a href="index.php">Home</a></li>
-      <li class="active"><a href="membre.php">Membre</a></li>     
-      <li class="last"><a href="contact.php">Contact</a></li>
+    <ul>
+      <li class="active"><a href="index.php">Home</a></li>
+      <li><a href="membre.php">Membre</a></li>      
+      <!--<li><a href="portfolio.html">Portfolio</a></li>
+      <li><a href="gallery.html">Gallery</a></li>-->
+	  <li><a href="./events/">Events</a></li>
+	  <li><a href="./calendar/all">Calendrier</a></li>
+      <li class="last"><a href="contact.php">Contact</a></li>    
+	  <?php if (isset($_SESSION['pseudo'])) // Si le membre est connecté
+{ ?>
+	  <li><a href="./mp.php">Messages(<?php echo $nbre_non_vus['nbre'];?>)</a>
+        <ul>
+          <li><a href="./mp.php">Boite de réception</a>          
+          <li><a href="./mp.php?action=ecrire">Nouveau Message</a></li>          
+          <li><a href="./mp.php?action=LireMpRecu">Message Envoyer</a></li>
+		  <li><a href="./mp.php?action=Corbeil">Message Supprimer</a></li>
+        </ul>
+      </li>
+	  <?php }?>
     </ul>
    </nav> 
     <div class="clear"></div>
@@ -80,9 +98,13 @@ else
 </div>
 <br />
 <br />
+
+    
     <div id="gallery" class="box">
 		
 <?php
+		
+
 //On récupère les variables
 $i = 0;
 $temps = time(); 
@@ -96,10 +118,17 @@ $conmdp = $_POST['conmdp'];
 <div id="corps_forum">
          <h2>Inscription Reussite</h2>
   		<hr size="3" />
+		<script language="JavaScript"> 
+<!-- Debut
+   /* var texte_dans_inputText = "texte texte texte texte texte";
+    document.write('<form action="" method="">');
+    document.write('Info : <input type="text" name="info" value="' + compteur + '"><br />');
+    document.write('</form>');*/
+// fin -->
+</script>
         <?php
 		
-$pseudo_erreur1 = NULL;
-$pseudo_erreur2 = NULL;
+
 $mdp_erreur = NULL;
 $email_erreur1 = NULL;
 $email_erreur2 = NULL;
@@ -111,16 +140,17 @@ $avatar_erreur2 = NULL;
 $avatar_erreur3 = NULL;
 
 
+//Encore est toujours notre belle variable $i :p
 $i = 0;
 $temps = time(); 
-$pseudo = mysql_real_escape_string($_POST['pseudo']);
+
 $email = mysql_real_escape_string($_POST['email']);
 $nom = mysql_real_escape_string($_POST['nom']);
 $prenom = mysql_real_escape_string($_POST['prenom']);
 $question = mysql_real_escape_string($_POST['question']);
 $reponse = mysql_real_escape_string($_POST['reponse']);
-$pass = $_POST['password'];
-$confirm = $_POST['confirm'];
+$pass = md5($_POST['password']);
+$confirm = md5($_POST['confirm']);
 $sexe = mysql_real_escape_string($_POST['sexe']);
 $nais =mysql_real_escape_string($_POST['annee']);
 $twitter = mysql_real_escape_string($_POST["twitter"]);
@@ -136,16 +166,12 @@ $adresse = mysql_real_escape_string($_POST["adresse"]);
 $site = mysql_real_escape_string($_POST["site"]);
 $del = mysql_real_escape_string($_POST['delete']);
 //Vérification du mdp
-if ($pass != $confirm || empty($confirm) || empty($pass))
+if ($_POST['password'] != $_POST['confirm'] && (!empty($_POST['password']) || !empty($_POST['confirm'])))
 {
-$mdp_erreur = "Votre mot de passe et votre confirmation diffèrent ou sont vides";
+$mdp_erreur = "Votre mot de passe et votre confirmation diffèrent";
 $i++;
 }
-if (strlen($pseudo) < 3 || strlen($pseudo) > 20)
-{
-        $pseudo_erreur2 = "Votre pseudo est soit trop grand, soit trop petit";
-        $i++;
-}
+
 //Vérification de l'adresse email
 
 //Il faut que l'adresse email n'ait jamais été utilisée (sauf si elle n'a pas été modifiée)
@@ -232,21 +258,33 @@ if (strtolower($data1['email']) != strtolower($email))
         echo'<h1>Modification terminée</h1>';
         echo'<p>Votre profil a été modifié avec succès !</p>';
         echo'<p>Cliquez <a href="./index.php">ici</a> 
-        pour revenir à la page d accueil</p>';
+        pour revenir à la page d\'accueil</p>';
  
         //On modifie la table
- 
-        mysql_query("
-        UPDATE users
-        SET  pseudo = '".$pseudo."', mdp ='".$pass."' , email = '".$email."' ,
-        nom = '".$nom."' , prenom = '".$prenom."',
-        reponse = '".$reponse."' , datenais = '".$nais."' , 
-        question = '".$question."', 
-		twitter = '".$twitter."', fb = '".$fb."', irc = '".$irc."', linkedin = '".$linkedin."',
-		diaspora = '".$diaspora."', flickr = '".$flickr."', wiki = '".$wiki."', propos = '".$propos."',
-		tel = '".$tel."', adresse = '".$adresse."', site = '".$site."'
-        WHERE id = '".intval($_SESSION['id'])."'") or die (mysql_error());
- 
+		if(empty($_POST['password']) && empty($_POST['confirm']))
+		{
+			mysql_query("
+			UPDATE users
+			SET  email = '".$email."' ,
+			nom = '".$nom."' , prenom = '".$prenom."',
+			datenais = '".$nais."' , 			
+			twitter = '".$twitter."', fb = '".$fb."', irc = '".$irc."', linkedin = '".$linkedin."',
+			diaspora = '".$diaspora."', flickr = '".$flickr."', wiki = '".$wiki."', propos = '".$propos."',
+			tel = '".$tel."', adresse = '".$adresse."', site = '".$site."'
+			WHERE id = '".intval($_SESSION['id'])."'") or die (mysql_error());
+		}
+		else
+		{
+			mysql_query("
+			UPDATE users
+			SET  mdp ='".$pass."' , email = '".$email."' ,
+			nom = '".$nom."' , prenom = '".$prenom."',
+			datenais = '".$nais."' , 			
+			twitter = '".$twitter."', fb = '".$fb."', irc = '".$irc."', linkedin = '".$linkedin."',
+			diaspora = '".$diaspora."', flickr = '".$flickr."', wiki = '".$wiki."', propos = '".$propos."',
+			tel = '".$tel."', adresse = '".$adresse."', site = '".$site."'
+			WHERE id = '".intval($_SESSION['id'])."'") or die (mysql_error());
+		}
         //Et on définit de nouvelles variables de sesssion
         //Pour celà on a besoin de la bdd
         $requete = mysql_query('
@@ -275,9 +313,21 @@ else
         echo'<p>'.$avatar_erreur2.'</p>';
         echo'<p>'.$avatar_erreur3.'</p>';
         echo'<p> Cliquez
- <a href="./voirprofil.php?action=modifier">ici</a> pour recommencer</p>';
+ <a href="edit.php?m='.$_SESSION[id].'">ici</a> pour recommencer</p>';
 }
 		
+		
+		
+		
+		
+/*foreach($_POST as $key => $val)
+{
+ echo '$_POST["'.$key.'"]='.$val.'<br />';
+ $cmp++;
+ }
+
+  echo 'cmp = '.$cmp;*/
+  
 mysql_close();
 ?>
 </div>
@@ -287,7 +337,9 @@ mysql_close();
 
 <div class="main-container">
  </div>
-  
+  <div style="position:fixed;left:30px;top:90%;" title="Clickez pour signaler un problème">
+<a href="404/bug.php"><img src="images/bug.png" alt="Logo" /></a>
+</div>
  <footer>
    <table>
 	<tr>
@@ -295,10 +347,12 @@ mysql_close();
     <td><p class="tagline_left">Copyright &copy; 2012 - All Rights Reserved - <a href="http://mozilla-tunisia.org">Mozilla Tunisia</a></p></td>
 	</tr>
 	</table>
+    <!--<p class="tagline_right">Design by <a href="http://www.priteshgupta.com/" title="Pritesh Gupta" target="_blank" >PriteshGupta.com</a></p>-->
     <br class="clear" />
   </footer>
 
 <br />
 <br />
+<!-- Free template distributed by http://freehtml5templates.com -->
     </body>
 </html>

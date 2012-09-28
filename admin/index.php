@@ -1,12 +1,14 @@
 <?php
 session_start();
+header('Content-Type: text/html; charset=ISO-8859-1');
 include("../scripts/identifiants.php");
 ?>
-<!doctype html>
-<html lang="en">
-
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//FR" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta charset="utf-8"/>
+	<meta http-equiv="Content-Language" content="fr,en" />
+	<html xmlns="http://www.w3.org/1999/xhtml" lang="fr">
 	<title>Dashboard I Admin Panel</title>
 	
 	<link rel="stylesheet" href="css/layout.css" type="text/css" media="screen" />
@@ -79,6 +81,19 @@ include("../scripts/identifiants.php");
 			<input type="text" value="Quick Search" onfocus="if(!this._haschanged){this.value=''};this._haschanged=true;">
 		</form>
 		<hr/>
+		<h3>Menu</h3>
+		<ul class="toggle">
+			<li class="icn_new_article"><a href="#">Membre</a></li>
+			<li class="icn_edit_article"><a href="#">Events</a></li>
+			<li class="icn_categories"><a href="#">Calendrier</a></li>
+			<li class=""><a href="#">Messages</a></li>
+			<ul class="toggle">
+				<li class="icn_tags" style="padding-left:40px;"><a href="#">Nouveau</a></li>
+				<li class="icn_tags" style="padding-left:40px;"><a href="#">Boite de réception</a></li>
+				<li class="icn_tags" style="padding-left:40px;"><a href="#">Messages envoyer</a></li>
+				<li class="icn_tags" style="padding-left:40px;"><a href="#">Corbeil</a></li>
+			</ul>
+		</ul>
 		<h3>Content</h3>
 		<ul class="toggle">
 			<li class="icn_new_article"><a href="#">New Article</a></li>
@@ -88,9 +103,10 @@ include("../scripts/identifiants.php");
 		</ul>
 		<h3>Users</h3>
 		<ul class="toggle">
-			<li class="icn_add_user"><a href="#">Add New User</a></li>
-			<li class="icn_view_users"><a href="#">View Users</a></li>
-			<li class="icn_profile"><a href="#">Your Profile</a></li>
+			<li class="icn_add_user"><a href="#">Ajouter Utilisateur</a></li>
+			<li class="icn_edit_users"><a href="#">Modifier Utilisateur</a></li>
+			<li class="icn_delete"><a href="#">Supprimer Utilisateur</a></li>
+			<li class="icn_view_users"><a href="#">Liste Utilisateur</a></li>
 		</ul>
 		<h3>Media</h3>
 		<ul class="toggle">
@@ -102,6 +118,12 @@ include("../scripts/identifiants.php");
 		<h3>Admin</h3>
 		<ul class="toggle">
 			<li class="icn_settings"><a href="#">Options</a></li>
+			<li class="icn_security"><a href="#">Security</a></li>
+			<li class="icn_jump_back"><a href="#">Logout</a></li>
+		</ul>
+		<h3>Bug</h3>
+		<ul class="toggle">
+			<li class="icn_settings"><a href="#">List</a></li>
 			<li class="icn_security"><a href="#">Security</a></li>
 			<li class="icn_jump_back"><a href="#">Logout</a></li>
 		</ul>

@@ -1,6 +1,8 @@
 <?php
 session_start();
 include("scripts/identifiants.php");
+$nbr_non_vus = mysql_query("SELECT COUNT(*) AS nbre FROM mp WHERE destinataire='".$_SESSION['pseudo']."' AND vu='0' AND (efface='0' OR efface='2')")or die(mysql_error());
+$nbre_non_vus = mysql_fetch_assoc($nbr_non_vus);
 
 // OPTIONS - PLEASE CONFIGURE THESE BEFORE USE!
 
@@ -149,12 +151,13 @@ if (isset($_SESSION['pseudo'])) // Si le membre est connecté
 }
 else
 {?>	
-	<a href="connexion.php">Sign In</a> or <a href="register.php">Join</a>
+	<a href="connexion.php">Sign In</a>
 	<?php } ?> 
 </div>
 
 <div class="main-container">
   <div id="sub-headline">
+    <!--<div class="tagline_left"><p id="tagline2">Tel: 123 333 4444 | Mail: <a href="mailto:email@website.com">email@website.com</a></p></div>-->
     <div class="tagline_right">
       <form action="#" method="post">
         <fieldset>
@@ -173,7 +176,22 @@ else
     <ul class="nav">
       <li><a href="index.php">Home</a></li>
       <li><a href="membre.php">Membre</a></li>      
-      <li class="active"><a href="contact.php">Contact</a></li>
+      <!--<li><a href="portfolio.html">Portfolio</a></li>
+      <li><a href="gallery.html">Gallery</a></li>-->
+	  <li><a href="./events/">Events</a></li>
+	  <li><a href="./calendar/all">Calendrier</a></li>
+      <li class="active"><a href="contact.php">Contact</a></li>    
+	  <?php if (isset($_SESSION['pseudo'])) // Si le membre est connecté
+{ ?>
+	  <li><a href="./mp.php">Messages(<?php echo $nbre_non_vus['nbre'];?>)</a>
+        <ul>
+          <li><a href="./mp.php">Boite de réception</a>          
+          <li><a href="./mp.php?action=ecrire">Nouveau Message</a></li>          
+          <li><a href="./mp.php?action=LireMpRecu">Message Envoyer</a></li>
+		  <li><a href="./mp.php?action=Corbeil">Message Supprimer</a></li>
+        </ul>
+      </li>
+	  <?php }?>
     </ul>
    </nav> 
     <div class="clear"></div>
@@ -209,6 +227,9 @@ if ($result != NULL) {
 <noscript>
 		<p><input type="hidden" name="nojs" id="nojs" /></p>
 </noscript>
+
+
+
    <br />
             <p>
               <input type="text" name="name" id="name" value="<?php get_data("name"); ?>" size="22" />
@@ -250,6 +271,9 @@ if ($result != NULL) {
           </ul>
         </div>
       </div>
+
+      
+      
       <div class="clear"></div>
     </div>
     
@@ -257,7 +281,9 @@ if ($result != NULL) {
  </div>
 <div class="main-container">
  </div>
- 
+ <div style="position:fixed;left:30px;top:90%;" title="Clickez pour signaler un problème">
+<a href="404/bug.php"><img src="images/bug.png" alt="Logo" /></a>
+</div>
  <footer>
    <table>
 	<tr>
@@ -265,11 +291,13 @@ if ($result != NULL) {
     <td><p class="tagline_left">Copyright &copy; 2012 - All Rights Reserved - <a href="http://mozilla-tunisia.org">Mozilla Tunisia</a></p></td>
 	</tr>
 	</table>
+    <!--<p class="tagline_right">Design by <a href="http://www.priteshgupta.com/" title="Pritesh Gupta" target="_blank" >PriteshGupta.com</a></p>-->
     <br class="clear" />
   </footer>
 
 <br />
 <br />
+<!-- Free template distributed by http://freehtml5templates.com -->
 </div>
     </body>
 </html>

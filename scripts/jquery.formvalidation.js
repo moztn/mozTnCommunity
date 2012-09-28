@@ -84,7 +84,7 @@
 		pseudo 				: /^[a-zA-Z0-9]{3,}$/gi,
 		email				: /^([\w.])+\@(([\w])+\.)[a-zA-Z0-9]{2,}/,
 		txt					: /^[a-zA-Z\sa-zA-Z]{3,}$/,
-		domain				: /^(http:\/\/)([\w]+\.){1,}[A-Z]{2,4}\b/gi,
+		domain				: /^(http:\/\/)|(https:\/\/)([\w]+\.){1,}[A-Z]{2,4}\b/gi,
 		password			: /[\w]{3,12}/gi,
 		phone				: /[0-9]{8}$/gi,
 		zip					: /^[0-9]{4,}$/gi,

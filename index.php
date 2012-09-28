@@ -1,6 +1,8 @@
 <?php
 session_start();
 include("scripts/identifiants.php");
+$nbr_non_vus = mysql_query("SELECT COUNT(*) AS nbre FROM mp WHERE destinataire='".$_SESSION['pseudo']."' AND vu='0' AND (efface='0' OR efface='2')")or die(mysql_error());
+$nbre_non_vus = mysql_fetch_assoc($nbr_non_vus);		
 ?>
 <!DOCTYPE html>
 <title>Mozilla Tunisia | Home</title>
@@ -33,12 +35,13 @@ if (isset($_SESSION['pseudo'])) // Si le membre est connecté
 }
 else
 {?>	
-	<a href="connexion.php">Sign In</a> or <a href="register.php">Join</a>
+	<a href="connexion.php">Sign In</a>
 	<?php } ?> 
 </div>
 
 <div class="main-container">
   <div id="sub-headline">
+    <!--<div class="tagline_left"><p id="tagline2">Tel: 123 333 4444 | Mail: <a href="mailto:email@website.com">email@website.com</a></p></div>-->
     <div class="tagline_right">
       <form action="#" method="post">
         <fieldset>
@@ -57,7 +60,22 @@ else
     <ul class="nav">
       <li class="active"><a href="index.php">Home</a></li>
       <li><a href="membre.php">Membre</a></li>      
+      <!--<li><a href="portfolio.html">Portfolio</a></li>
+      <li><a href="gallery.html">Gallery</a></li>-->
+	  <li><a href="./events/">Events</a></li>
+	  <li><a href="./calendar/all">Calendrier</a></li>
       <li class="last"><a href="contact.php">Contact</a></li>    
+	  <?php if (isset($_SESSION['pseudo'])) // Si le membre est connecté
+{ ?>
+	  <li><a href="./mp.php">Messages(<?php echo $nbre_non_vus['nbre'];?>)</a>
+        <ul>
+          <li><a href="./mp.php">Boite de réception</a>          
+          <li><a href="./mp.php?action=ecrire">Nouveau Message</a></li>          
+          <li><a href="./mp.php?action=LireMpRecu">Message Envoyer</a></li>
+		  <li><a href="./mp.php?action=Corbeil">Message Supprimer</a></li>
+        </ul>
+      </li>
+	  <?php }?>
     </ul>
    </nav> 
     <div class="clear"></div>
@@ -67,16 +85,20 @@ else
   <div class="container1">
   <div id="mySlides">
     <div id="slide1">    
-        <img src="images/show1.jpg" alt="Slide 1 jFlow Plus" />        
+        <img src="images/show1.jpg" alt="Slide 1 jFlow Plus" />
+        <!--<span><b class="slideheading">First Featured Slide</b><br />Featured Text.....<a href="#" title="Coolness" class="readmore">Read More!</a></span>-->
 	</div>    	
     <div id="slide2">
-        <img src="images/show2.jpg" alt="Slide 2 jFlow Plus" />        
+        <img src="images/show2.jpg" alt="Slide 2 jFlow Plus" />
+        <!--<span><b class="slideheading">Second Featured Slide</b><br />Featured Text.....<a href="#" title="Coolness" class="readmore">Read More!</a></span>-->
     </div>   
 	<div id="slide3">
         <img src="images/show3.jpg" alt="Slide 3 jFlow Plus" />
+        <!--<span><b class="slideheading">Third Featured Slide</b><br />Featured Text.....<a href="#" title="Coolness" class="readmore">Read More!</a></span>-->
     </div>
 	<div id="slide4">
         <img src="images/show4.jpg" alt="Slide 3 jFlow Plus" />
+        <!--<span><b class="slideheading">Third Featured Slide</b><br />Featured Text.....<a href="#" title="Coolness" class="readmore">Read More!</a></span>-->
     </div>
 </div>
 
@@ -123,7 +145,50 @@ The program provides a simple framework and a specific set of tools to help Mozi
     </article>
     
  </div>
+ 
+<!--<div class="callout"> 
+    <div class="calloutcontainer"> 
+        <div class="container_12"> 
+            <div class="grid"> 
+                <div class="alignleft">
+                    <h3>Like it?  Download it for free!</h3> 
+                    <p>At <a href="http://www.priteshgupta.com/templates/elegant-press">http://www.priteshgupta.com/templates/elegant-press</a></p> 
+                </div> 
+        <a href="http://www.priteshgupta.com/templates/elegant-press/" class="more" target="_blank">Download</a>
+            </div> 
+            <div class="clear"></div> 
+        </div> 
+        <div class="calloutoverlay"></div> 
+        <div class="calloutoverlaybottom"></div> 
+    </div> 
+</div> 
+<br /><br />
+
+     <div class="container2">
+     <article id="home_featured2">
+      <ul>
+        <li>
+          <div class="imgholder"><a href="images/slide1.jpg" data-gal="prettyPhoto[featured]" title="First Featured Title"><img src="images/featured1.jpg" width="275" height="145" alt="" /></a></div>
+          <h4>First Featured Title</h4>
+          <p>Orciint erdum condimen terdum nulla mcorper elit nam curabitur laoreet met prae senean et iac ulum. Metridiculis cons eque quis iaculum aenean nunc aenean.</p>
+        </li>
+        <li>
+          <div class="imgholder"><a href="images/slide2.jpg" data-gal="prettyPhoto[featured]" title="Second Featured Title"><img src="images/featured2.jpg" width="275" height="145" alt="" /></a></div>
+          <h4>Second Featured Title</h4>
+          <p>Orciint erdum condimen terdum nulla mcorper elit nam curabitur laoreet met prae senean et iac ulum. Metridiculis cons eque quis iaculum aenean nunc aenean.</p>
+        </li>
+        <li class="last">
+          <div class="imgholder"><a href="images/slide3.jpg" data-gal="prettyPhoto[featured]" title="Third Featured Title"><img src="images/featured3.jpg" width="275" height="145" alt="" /></a></div>
+          <h4>Third Featured Title</h4>
+          <p>Orciint erdum condimen terdum nulla mcorper elit nam curabitur laoreet met prae senean et iac ulum. Metridiculis cons eque quis iaculum aenean nunc aenean.</p>
+        </li>
+      </ul>
+      <br class="clear" />
+    </article>
+  </div>
+</div>-->
 <div class="main-container">
+
  </div>
  
 <div class="callout"> 
@@ -138,28 +203,44 @@ The program provides a simple framework and a specific set of tools to help Mozi
 		</li>
         <li><a href="#">Wiki</a><br />
         Notre Wiki, il est en cours de construction ...
-        </li>   
+        </li>
+       <li><a href="https://github.com/moztn">GitHub</a><br />
+        Notre compte GitHub vous y trouverez tout nos projets ...
+		</li> 
        </ul>
     </article>
     <article class="footbox last">
-      <h2>We Are Social!</h2>
+      <h2>Nous Suivre</h2>
       <div id="social">
-      <a href="#"><img src="images/ico-social-facebook.png" alt="" /></a>
-      <a href="#"><img src="images/ico-social-twitter.png" alt="" /></a>
-      <a href="#"><img src="images/ico-social-flickr.png" alt="" /></a>
-      <a href="#"><img src="images/ico-social-linkedin.png" alt="" /></a>
-      <a href="#"><img src="images/ico-social-delicious.png" alt="" /></a>
-      <a href="#"><img src="images/ico-social-youtube.png" alt="" /></a>
+      <a href="https://www.facebook.com/MozillaTunisia"><img src="images/ico-social-facebook.png" alt="" /></a>
+      <a href="https://twitter.com/MozillaTunisia"><img src="images/ico-social-twitter.png" alt="" /></a>
+      <a href="http://www.flickr.com/photos/mozillatunisia/"><img src="images/ico-social-flickr.png" alt="" /></a>
+      <a href="https://github.com/moztn"><img src="images/github.png" style="width:28px;height:28px;padding-top: 2px;" alt="" /></a>
+      <a href="https://www.youtube.com/MozillaTunisia"><img src="images/ico-social-youtube.png" alt="" /></a>
       </div> 
     </article>
-  <article class="latestgallery">
-      <h2>Latest Work</h2>
+	<?php $requete4 = mysql_query("SELECT * FROM users ORDER BY dateinscri DESC LIMIT 0, 4"); ?>
+	<article class="latestgallery">
+      <h2>Nouveaux Membres</h2>
       <ul>
-		<li><a href="images/thumb.jpg" data-gal="prettyPhoto[gallery]" title="Title"><img src="images/thumb.jpg" alt="" width="150" height="95" /></a></li>
-        <li><a href="images/thumb2.jpg" data-gal="prettyPhoto[gallery]" title="Title"><img src="images/thumb2.jpg" alt=""  width="150" height="95" /></a></li>
-        <li><a href="images/thumb3.jpg" data-gal="prettyPhoto[gallery]" title="Title"><img src="images/thumb3.jpg" alt=""  width="150" height="95" /></a></li>
-        <li><a href="images/thumb4.jpg" data-gal="prettyPhoto[gallery]" title="Title"><img src="images/thumb4.jpg" alt=""  width="150" height="95" /></a></li>       
-      </ul>
+	  <?php 
+	   while ($data2 = mysql_fetch_assoc($requete4))
+       {
+		   
+       echo '
+        <li><a href="./profil.php?m='.$data2['id'].'">
+			<div class="panel grid-profile">
+				<div class="row">					
+						<img  class="profiles-people-avatar" src="./images/avatars/'.$data2['avatar'].'" alt="Ce membre n\'a pas d\'avatar" />
+						</div>
+						<div class="grid-profile-text">						
+						Pseudo : '.stripslashes(htmlspecialchars($data2['pseudo'])).'					
+				</div>
+			</div>
+		</li></a>
+        ';
+		}?>
+		 </ul>
     </article>
     
             <div class="clear"></div> 
@@ -168,17 +249,25 @@ The program provides a simple framework and a specific set of tools to help Mozi
         <div class="calloutoverlaybottom"></div> 
     </div> 
 </div> </div> 
+<div style="position:fixed;left:30px;top:90%;" title="Clickez pour signaler un problème">
+	<a href="404/bug.php"><img src="images/bug.png" alt="Logo" /></a>
+</div>
+<div style="position:fixed;left:70px;top:90%;" title="Clickez pour inviter un mozilien">
+	<a href="invite.php"><img src="images/adduser.png" alt="Logo" /></a>
+</div>
  <footer>
 	<table>
 	<tr>
 	<td><img src="images/logo.png" alt="Logo" /></td>
     <td><p class="tagline_left">Copyright &copy; 2012 - All Rights Reserved - <a href="http://mozilla-tunisia.org">Mozilla Tunisia</a></p></td>
 	</tr>
-	</table>  
+	</table>
+    <!--<p class="tagline_right">Design by <a href="http://www.priteshgupta.com/" title="Pritesh Gupta" target="_blank" >PriteshGupta.com</a></p>-->
     <br class="clear" />
   </footer>
 
 <br />
 <br />
+<!-- Free template distributed by http://freehtml5templates.com -->
     </body>
 </html>

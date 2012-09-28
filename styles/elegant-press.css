@@ -18,6 +18,24 @@ header,hgroup,menu,nav,section
 {
 	display:block
 }
+.styled-select {
+background: url("custom-form-sprites1.png") no-repeat scroll right center transparent;
+    border-right: 1px solid #CCCCCC;
+    height: 24px;
+    overflow: hidden;
+
+    width: 130px;
+}
+.styled-select select {
+   background: transparent;
+   width: 150px;
+   padding: 2px 0 0 10px;
+   font-size: 14px;
+   border: 1px solid #ccc;
+   height: 24px;
+   overflow: hidden;
+}
+
 blockquote,q
 {
 	quotes:none
@@ -60,6 +78,8 @@ body
 	color:#333;
 	background:url(../images/mozorg-gradient.png) repeat-x scroll center top #F9F9F9;
 	padding:0
+	width:100%;
+	
 }
 .justify
 {
@@ -88,7 +108,7 @@ a
 {
 	outline:none;
 	text-decoration:none;
-	color:#A3443E!important
+	color:#A3443E;
 }
 .tagline_left
 {
@@ -458,6 +478,21 @@ select
     border-width: medium medium 1px !important;
     margin: 10px 0;
     width: 100%;
+	
+}
+.input-text.small {
+    -moz-border-bottom-colors: none !important;
+    -moz-border-image: none !important;
+    -moz-border-left-colors: none !important;
+    -moz-border-right-colors: none !important;
+    -moz-border-top-colors: none !important;
+    background: none;
+    border-color: -moz-use-text-color -moz-use-text-color #BBBBBB !important;
+    border-radius: 0 0 0 0 !important;
+    border-style: none none solid !important;
+    border-width: medium medium 1px !important;
+    margin: 10px 0;
+    width: 80%;
 	
 }
 input.input-text, textarea {

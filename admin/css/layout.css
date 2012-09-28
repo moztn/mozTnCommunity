@@ -313,9 +313,16 @@ background: url(../images/icn_add_user.png) no-repeat center left;
 #sidebar li.icn_view_users a {
 background: url(../images/icn_view_users.png) no-repeat center left;
 }
+#sidebar li.icn_edit_users a {
+background: url(../images/user_option.png) no-repeat center left;
+}
 #sidebar li.icn_profile a {
 background: url(../images/icn_profile.png) no-repeat center left;
 }
+#sidebar li.icn_delete a {
+background: url(../images/Light_Delete_user.png) no-repeat center left;
+}
+
 #sidebar li.icn_folder a {
 background: url(../images/icn_folder.png) no-repeat center left;
 }

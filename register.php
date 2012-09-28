@@ -1,6 +1,8 @@
 <?php
 session_start();
 include("scripts/identifiants.php");
+$nbr_non_vus = mysql_query("SELECT COUNT(*) AS nbre FROM mp WHERE destinataire='".$_SESSION['pseudo']."' AND vu='0' AND (efface='0' OR efface='2')")or die(mysql_error());
+$nbre_non_vus = mysql_fetch_assoc($nbr_non_vus);
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -33,7 +35,7 @@ include("scripts/identifiants.php");
 	<link rel="stylesheet" href="styles/demos.css">
 	<script>
 	$(function() {
-		$( "#datepicker" ).datepicker();
+		$( "#datepicker" ).datepicker({ minDate: "-90Y", maxDate: "-10Y" });
 	});
 	</script>
 <link href="tab/css/tabzilla.css" rel="stylesheet" />
@@ -58,13 +60,14 @@ if (isset($_SESSION['pseudo'])) // Si le membre est connecté
 }
 else
 {?>	
-	<a href="connexion.php">Sign In</a> or <a href="register.php">Join</a>
+	<a href="connexion.php">Sign In</a>
 	<?php } ?> 
 </div>
 
 
 <div class="main-container">
   <div id="sub-headline">
+    <!--<div class="tagline_left"><p id="tagline2">Tel: 123 333 4444 | Mail: <a href="mailto:email@website.com">email@website.com</a></p></div>-->
     <div class="tagline_right">
       <form action="#" method="post">
         <fieldset>
@@ -82,8 +85,23 @@ else
    <nav> 
     <ul class="nav">
       <li><a href="index.php">Home</a></li>
-      <li><a href="membre.php">Membre</a></li>     
-      <li class="last"><a href="contact.php">Contact</a></li>
+      <li><a href="membre.php">Membre</a></li>      
+      <!--<li><a href="portfolio.html">Portfolio</a></li>
+      <li><a href="gallery.html">Gallery</a></li>-->
+	  <li><a href="./events/">Events</a></li>
+	  <li><a href="./calendar/all">Calendrier</a></li>
+      <li class="last"><a href="contact.php">Contact</a></li>    
+	  <?php if (isset($_SESSION['pseudo'])) // Si le membre est connecté
+{ ?>
+	  <li><a href="./mp.php">Messages(<?php echo $nbre_non_vus['nbre'];?>)</a>
+        <ul>
+          <li><a href="./mp.php">Boite de réception</a>          
+          <li><a href="./mp.php?action=ecrire">Nouveau Message</a></li>          
+          <li><a href="./mp.php?action=LireMpRecu">Message Envoyer</a></li>
+		  <li><a href="./mp.php?action=Corbeil">Message Supprimer</a></li>
+        </ul>
+      </li>
+	  <?php }?>
     </ul>
    </nav> 
     <div class="clear"></div>
@@ -106,16 +124,24 @@ else
     
     <div id="gallery" class="box">
 	<?php
-	if (!isset($_SESSION['pseudo'])) // Si le membre est connecté
-{ ?>
+	if(isset($_GET['code'])and isset($_GET['mail']))
+	{ 
+	if($_GET['code']!= null and $_GET['mail']!= null)
+	{
+	$retour=mysql_query("SELECT * FROM users WHERE code='".$_GET['code']."' AND email='".$_GET['mail']."'");
+		$donnees= mysql_fetch_array($retour);
+		if($donnees['code']==$_GET['code'] AND $donnees['email']==$_GET['mail'])
+		{
+		if (!isset($_SESSION['pseudo'])) // Si le membre est connecté
+	{ ?>
 		<form id="ab" action="registerok.php" method="post" enctype="multipart/form-data" >
 		<h2>Inscription</h2>
-  <hr size="3" />
-  <p class="error"></p>
+		  <hr size="3" />
+		  <p class="error"></p>
 			<table border="0" class="tablee" style="width:550px;margin : 10px auto auto auto; ">				
 				<tr>
 					<td>Nom d'utilisateur :</td>
-					<td><input tabindex="1" required="true" mask="pseudo" name="pseudo" id="username" size="25" value="" title="Nom d'utilisateur" type="text" class="input-text big"/></td>
+					<td><input tabindex="1" required="true" mask="pseudo" name="pseudo" id="username" size="25" value="" title="Nom d'utilisateur" type="text" class="input-text big" /></td>
 				</tr>
 				<tr>
 					<td>Nom :</td>
@@ -141,11 +167,11 @@ else
 				</tr>
 				<tr>
 					<td>Adresse e-mail :</td>
-					<td><input required="true" mask="email" name="email" id="email" maxlength="100" value="" title="email" type="text" class="input-text big"/></td>
+					<td><input value="<?php $donnees['email']?>" type="hidden" required="true" mask="email" name="email" id="email" maxlength="100" value="" title="email" type="text" class="input-text big"/></td>
 				</tr>
 				<tr>
 					<td>Confirmation de l'adresse e-mail :</td>
-					<td><input required="true" mask="email" equal="email" name="confirmemail" id="confirmemail" value="" title="confirmemail" type="text" class="input-text big" /></td>
+					<td><input value="<?php $donnees['email']?>" type="hidden" required="true" mask="email" equal="email" name="confirmemail" id="confirmemail" value="" title="confirmemail" type="text" class="input-text big" /></td>
 				</tr>
 				<tr>
 					<td>Mot de passe :</td>
@@ -154,24 +180,7 @@ else
 				<tr>
 					<td>Confirmer le mot de passe :</td>
 					<td><input required="true" mask="password" equal="password" name="confirmpassword" id="confirmpassword" value="" title="Nom d'utilisateur" type="password" class="input-text big" /></td>
-				</tr>
-				<tr>
-					<td>Question secrete : </td>
-					<td> 
-					<div class="custom dropdown" style="width: 374px;">
-						<select name="question" id="question">
-							  <option>Meilleur ami?</option>
-							  <option>Votre premier animal?</option>
-							  <option>Le prenom de votre petit ami(e)?</option>
-							  <option>Votre acteur preferé?</option>
-						</select>
-						</div>
-					</td>
-				</tr>
-				<tr>
-					<td>Reponse : </td>
-					<td><input tabindex="7" required="true" mask="txt" name="reponse" id="password_confirm3" value="" title="Confirmation du mot de passe" type="text" class="input-text big" /></td>
-				</tr>
+				</tr>				
 				<tr>
 					<td><label for="avatar">Image :</label></td>
 					<td><input type="file" name="avatar" id="avatar" /></td>
@@ -189,16 +198,28 @@ else
 				</tr>
 			</table>
 		</form>
-		<?php } 
+		<?php 
+		} 
 		else
 			echo'Vous ête déjà inscrit';
+		}
+		else
+			echo'<br/><h6>Il faut avoir une invitation pour pourvoir rejoindre Mozilla Tunisia</h6><br/>';
+		
+		
 			?>
 		<br class="clear" />
-	</div>
+		<?php 
+		} 
+		
+		} ?>
 
+	</div>
 <div class="main-container">
  </div>
- 
+ <div style="position:fixed;left:30px;top:90%;" title="Clickez pour signaler un problème">
+<a href="404/bug.php"><img src="images/bug.png" alt="Logo" /></a>
+</div>
  <footer>
    <table>
 	<tr>
@@ -206,10 +227,12 @@ else
     <td><p class="tagline_left">Copyright &copy; 2012 - All Rights Reserved - <a href="http://mozilla-tunisia.org">Mozilla Tunisia</a></p></td>
 	</tr>
 	</table>
+    <!--<p class="tagline_right">Design by <a href="http://www.priteshgupta.com/" title="Pritesh Gupta" target="_blank" >PriteshGupta.com</a></p>-->
     <br class="clear" />
   </footer>
 
 <br />
 <br />
+<!-- Free template distributed by http://freehtml5templates.com -->
     </body>
 </html>
